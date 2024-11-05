@@ -1,0 +1,5 @@
+python3 -m venv .venv
+
+.venv\Scripts\activate
+
+pip install spotipy statistics pandas numpy scikit-learn tabulate requests python-dotenv
