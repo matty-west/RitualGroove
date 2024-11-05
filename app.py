@@ -16,10 +16,10 @@ client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
 
 scope = scope = "user-top-read user-library-read playlist-modify-private"  
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="e71190aac1b74450861923dcffa6295e",
-                                             client_secret="0a8d73bd89b74a12bb9f06cdcc91845a",
-                                             redirect_uri="http://localhost:8888/",
-                                             scope=scope))
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, 
+                                               client_secret=client_secret, 
+                                               redirect_uri="http://localhost:8888/",
+                                               scope=scope))
 
 user = sp.current_user()
 print(user['display_name'])
