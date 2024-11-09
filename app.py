@@ -24,8 +24,21 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
 user = sp.current_user()
 print(user['display_name'])
 
-top_tracks = sp.current_user_top_tracks(limit=50)
-audio_features = sp.audio_features([track['id'] for track in top_tracks['items']])
+playlists = sp.current_user_playlists()
+fourtc_playlist_id = None
+for playlist in playlists['items']:
+    if playlist['name'] == "4TC":
+        fourtc_playlist_id = playlist['id']
+        break
+
+if fourtc_playlist_id is None:
+    print("Error: '4TC' playlist not found.")
+    exit()
+
+# Get tracks from the "4TC" playlist
+fourtc_tracks = sp.playlist_tracks(fourtc_playlist_id)['items']
+fourtc_track_ids = [item['track']['id'] for item in fourtc_tracks if item['track'] is not None]
+audio_features = sp.audio_features(fourtc_track_ids)
 
 for feature in audio_features[0].keys():
     if feature in ['duration_ms', 'mode', 'type', 'id', 'uri', 'track_href', 'analysis_url']:
@@ -74,8 +87,24 @@ target_cluster = random.choice(df['cluster'].unique())
 cluster_tracks = df[df['cluster'] == target_cluster]
 random_track = cluster_tracks.sample(1).iloc[0]
 artist_id = random_track['artist_id']  
-genres = sp.recommendation_genre_seeds()['genres']
-random_genre = random.choice(genres)
+#genres = sp.recommendation_genre_seeds()['genres']
+genres = [
+    "alt-rock", "alternative", "ambient", "anime", 
+    "chill", "dance", "deep-house",
+    "drum-and-bass", "edm", "electronic", "emo", "folk", 
+    "groove", "happy", "hard-rock", "hardcore", "heavy-metal", 
+    "hip-hop", "house", "indie", "indie-pop",
+    "j-rock", "metal", "metal-misc", "metalcore", "minimal-techno", 
+    "new-release", "pop","rock", "summer", "synth-pop", "techno", "trance", 
+    "trip-hop", "work-out", 
+
+]
+# this will always include new releases
+random_genres = ["new-release"]  
+random_genres.extend(random.sample([g for g in genres if g != "new-release"], 3))
+
+# for when you don't want new releases, toggle on
+#random_genre = random.sample(genres,3)
 
 cluster_means = df[df['cluster'] == target_cluster][features].mean()
 #print(cluster_means.to_markdown(numalign="left", stralign="left"))
@@ -89,14 +118,15 @@ headers = {
 }
 params = {
     "seed_artists": [artist_id], 
-    "seed_tracks": [random_track['id']],  
-    "seed_genres": [random_genre],  
-    "target_danceability": cluster_means['danceability'],
+    #"seed_tracks": [random_track['id']],  
+    #"seed_genres": [random_genre],  
+    #"target_danceability": cluster_means['danceability'],
     "target_energy": cluster_means['energy'],
     "target_valence": cluster_means['valence'],
-    "target_tempo": cluster_means['tempo'],  # Add target tempo
-    "target_key": int(cluster_means['key']),
-    "limit": 25
+    #"target_tempo": cluster_means['tempo'], 
+    #"target_key": int(cluster_means['key']),
+    "target_popularity": 33,
+    "limit": 33
 }
 
 # API request
