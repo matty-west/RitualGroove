@@ -9,8 +9,8 @@ import random
 
 scope = "user-top-read user-library-read playlist-modify-public"
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="e71190aac1b74450861923dcffa6295e",
-                                               client_secret="0a8d73bd89b74a12bb9f06cdcc91845a",
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="",
+                                               client_secret="",
                                                redirect_uri="http://localhost:8888/",
                                                scope=scope))
 
